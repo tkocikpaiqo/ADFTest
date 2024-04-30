@@ -1,0 +1,9 @@
+{
+	"name": "tkocikADFTutorialDataFactory",
+	"location": "westeurope",
+	"identity": {
+		"type": "SystemAssigned",
+		"principalId": "5ee4c1f3-448b-4017-b2b7-d10c796c465c",
+		"tenantId": "1713f7c2-21d3-4f70-b20d-557a234826fb"
+	}
+}

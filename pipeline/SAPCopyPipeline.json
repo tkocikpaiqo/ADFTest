@@ -1,0 +1,94 @@
+{
+	"name": "SAPCopyPipeline",
+	"properties": {
+		"activities": [
+			{
+				"name": "ForEachTable",
+				"type": "ForEach",
+				"dependsOn": [],
+				"userProperties": [],
+				"typeProperties": {
+					"items": {
+						"value": "@pipeline().parameters.tableList",
+						"type": "Expression"
+					},
+					"activities": [
+						{
+							"name": "IterateTables",
+							"type": "ExecuteDataFlow",
+							"dependsOn": [],
+							"policy": {
+								"timeout": "0.12:00:00",
+								"retry": 0,
+								"retryIntervalInSeconds": 30,
+								"secureOutput": false,
+								"secureInput": false
+							},
+							"userProperties": [],
+							"typeProperties": {
+								"dataflow": {
+									"referenceName": "SAPTableDataflow",
+									"type": "DataFlowReference",
+									"parameters": {
+										"minSourceTimestamp": {
+											"value": "'@{pipeline().parameters.minSourceTimestamp}'",
+											"type": "Expression"
+										},
+										"maxSourceTimestamp": {
+											"value": "'@{pipeline().parameters.maxSourceTimestamp}'",
+											"type": "Expression"
+										},
+										"tableName": {
+											"value": "'@{item()}'",
+											"type": "Expression"
+										},
+										"triggerTimestamp": {
+											"value": "'@{formatDateTime(pipeline().TriggerTime, 'yyyyMMdd_HHmmss')}'",
+											"type": "Expression"
+										}
+									},
+									"datasetParameters": {
+										"sapSource": {
+											"tableName": {
+												"value": "@item()",
+												"type": "Expression"
+											}
+										},
+										"parquetSink": {
+											"sourceSystem": "SAP",
+											"tableName": {
+												"value": "@item()",
+												"type": "Expression"
+											}
+										}
+									}
+								},
+								"compute": {
+									"coreCount": 8,
+									"computeType": "General"
+								},
+								"traceLevel": "Fine"
+							}
+						}
+					]
+				}
+			}
+		],
+		"parameters": {
+			"tableList": {
+				"type": "array"
+			},
+			"minSourceTimestamp": {
+				"type": "string",
+				"defaultValue": "0001-01-01 00:00:00"
+			},
+			"maxSourceTimestamp": {
+				"type": "string",
+				"defaultValue": "9999-12-31 23:59:59"
+			}
+		},
+		"annotations": [],
+		"lastPublishTime": "2024-04-22T14:08:36Z"
+	},
+	"type": "Microsoft.DataFactory/factories/pipelines"
+}

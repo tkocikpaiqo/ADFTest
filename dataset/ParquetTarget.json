@@ -1,0 +1,32 @@
+{
+	"name": "ParquetTarget",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "ADLSG2LinkedService",
+			"type": "LinkedServiceReference"
+		},
+		"parameters": {
+			"sourceSystem": {
+				"type": "string"
+			},
+			"tableName": {
+				"type": "string"
+			}
+		},
+		"annotations": [],
+		"type": "Parquet",
+		"typeProperties": {
+			"location": {
+				"type": "AzureBlobFSLocation",
+				"folderPath": {
+					"value": "@concat(dataset().sourceSystem, '/', dataset().tableName, '/', formatDateTime(pipeline().TriggerTime, 'yyyy/MM/dd'))",
+					"type": "Expression"
+				},
+				"fileSystem": "practicecontainer"
+			},
+			"compressionCodec": "snappy"
+		},
+		"schema": []
+	},
+	"type": "Microsoft.DataFactory/factories/datasets"
+}

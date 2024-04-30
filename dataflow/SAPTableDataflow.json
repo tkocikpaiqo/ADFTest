@@ -1,0 +1,54 @@
+{
+	"name": "SAPTableDataflow",
+	"properties": {
+		"type": "MappingDataFlow",
+		"typeProperties": {
+			"sources": [
+				{
+					"dataset": {
+						"referenceName": "SAPSource",
+						"type": "DatasetReference"
+					},
+					"name": "sapSource"
+				}
+			],
+			"sinks": [
+				{
+					"dataset": {
+						"referenceName": "ParquetTarget",
+						"type": "DatasetReference"
+					},
+					"name": "parquetSink"
+				}
+			],
+			"transformations": [
+				{
+					"name": "filterDate"
+				}
+			],
+			"scriptLines": [
+				"parameters{",
+				"     minSourceTimestamp as string,",
+				"     maxSourceTimestamp as string,",
+				"     tableName as string,",
+				"     triggerTimestamp as string",
+				"}",
+				"source(allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     isolationLevel: 'READ_UNCOMMITTED',",
+				"     format: 'table') ~> sapSource",
+				"sapSource filter(toTimestamp(byName('DATUMBW')) >= toTimestamp($minSourceTimestamp) && toTimestamp(byName('DATUMBW')) <= toTimestamp($maxSourceTimestamp)) ~> filterDate",
+				"filterDate sink(allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     format: 'parquet',",
+				"     partitionFileNames:[(concat($tableName, '_', $triggerTimestamp, '.parquet'))],",
+				"     umask: 0022,",
+				"     preCommands: [],",
+				"     postCommands: [],",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true,",
+				"     partitionBy('hash', 1)) ~> parquetSink"
+			]
+		}
+	}
+}
